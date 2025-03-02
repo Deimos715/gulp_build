@@ -1,0 +1,9 @@
+$dev-mode: true;
+$img-path: if($dev-mode, '/src/img/', '/assets/img/');
+
+// Font Family
+$font-body: 'Inter', sans-serif;
+
+// Colors
+$base-color:#FFBC21;
+$bg-color: #fff;
