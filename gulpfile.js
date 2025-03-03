@@ -1,19 +1,21 @@
-const {src, dest, watch, parallel, series} = require('gulp');
+import { src, dest, watch, parallel, series } from 'gulp';
+import sass from 'gulp-sass';
+import * as sassCompiler from 'sass';
+import concat from 'gulp-concat';
+import uglify from 'gulp-uglify';
+import browserSync from 'browser-sync';
+import autoprefixer from 'gulp-autoprefixer';
+import clean from 'gulp-clean';
+import avif from 'gulp-avif';
+import webp from 'gulp-webp';
+import imagemin from 'gulp-imagemin';
+import newer from 'gulp-newer';
+import ttf2woff2 from 'gulp-ttf2woff2';
+import svgSprite from 'gulp-svg-sprite';
+import include from 'gulp-include';
+import cleanCSS from 'gulp-clean-css';
 
-const scss   = require('gulp-sass')(require('sass'));
-const concat = require('gulp-concat');
-const uglify = require('gulp-uglify-es').default; 
-const browserSync = require('browser-sync').create();
-const autoprefixer = require('gulp-autoprefixer');
-const clean = require('gulp-clean');
-const avif = require('gulp-avif');
-const webp = require('gulp-webp');
-const imagemin = require('gulp-imagemin');
-const newer = require('gulp-newer');
-const fonter = require('gulp-fonter');
-const ttf2woff2 = require('gulp-ttf2woff2');
-const svgSprite = require('gulp-svg-sprite');
-const include = require('gulp-include');
+const scss = sass(sassCompiler);
 
 function pages() {
   return src('app/pages/*.html')
@@ -24,55 +26,32 @@ function pages() {
     .pipe(browserSync.stream())
 }
 
-// Исходная функция для шрифтов
-// function fonts() {
-//   return src('app/fonts/src/*.*')
-//     .pipe(fonter({
-//       formats: ['woff', 'ttf']
-//     }))
-//     .pipe(src('app/fonts/*.ttf'))
-//     .pipe(ttf2woff2())
-//     .pipe(dest('app/fonts'))
-// }
-
 function fonts() {
-  return src('app/fonts/src/*.{otf,ttf}')
-    .pipe(fonter({ formats: ['woff'] }))
-    .pipe(rename(function (path) {
-      path.dirname = '';
-    }))
-    .pipe(dest('app/fonts'))
-    .pipe(src('app/fonts/src/*.ttf'))
+  return src('app/fonts/src/*.ttf')
     .pipe(ttf2woff2())
-    .pipe(rename(function (path) {
-      path.dirname = '';
-    }))
     .pipe(dest('app/fonts'));
 }
 
-function images(){
+function images() {
   return src(['app/images/src/*.*', '!app/images/src/*.svg'])
     .pipe(newer('app/images'))
-    .pipe(avif({ quality : 50}))
-
+    .pipe(avif({ quality: 50 }))
     .pipe(src('app/images/src/*.*'))
     .pipe(newer('app/images'))
     .pipe(webp())
-
     .pipe(src('app/images/src/*.*'))
     .pipe(newer('app/images'))
     .pipe(imagemin())
-
     .pipe(dest('app/images'))
 }
 
-function sprite () {
+function sprite() {
   return src('app/images/*.svg')
     .pipe(svgSprite({
       mode: {
         stack: {
           sprite: '../sprite.svg',
-          example: true 
+          example: true
         }
       }
     }))
@@ -91,11 +70,12 @@ function scripts() {
 
 function styles() {
   return src('app/scss/main.scss')
-    .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version']}))
+    .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
     .pipe(concat('style.min.css'))
-    .pipe(scss({ outputStyle: 'compressed' }))
+    .pipe(scss())
+    .pipe(cleanCSS())
     .pipe(dest('app/css'))
-    .pipe(browserSync.stream())
+    .pipe(browserSync.stream());
 }
 
 function watching() {
@@ -110,7 +90,6 @@ function watching() {
   watch(['app/components/*', 'app/pages/*'], pages)
   watch(['app/*.html']).on('change', browserSync.reload);
 }
-
 
 function cleanDist() {
   return src('dist')
@@ -127,18 +106,10 @@ function building() {
     'app/fonts/*.*',
     'app/js/main.min.js',
     'app/**/*.html'
-  ], {base : 'app'})
+  ], { base: 'app' })
     .pipe(dest('dist'))
 }
 
-exports.styles = styles;
-exports.images = images;
-exports.fonts = fonts;
-exports.pages = pages;
-exports.building = building;
-exports.sprite = sprite;
-exports.scripts = scripts;
-exports.watching = watching;
-
-exports.build = series(cleanDist, building);
-exports.default = parallel(styles, images, scripts, pages, watching);
+export { styles, images, fonts, pages, building, sprite, scripts, watching };
+export const build = series(cleanDist, building);
+export default parallel(styles, images, scripts, pages, watching);

@@ -2,23 +2,23 @@
 * Connecting SCSS sources normalize-css
 */
 
-@import "normalize/normalize.scss";
+@use "normalize/normalize.scss" as *;
 
 
 /*
 * Connecting SCSS sources reset-css
 */
 
-@import "reset/reset.scss";
+@use "reset/reset.scss" as *;
 
 
 /*
 * fonts
 */
-@import "fonts/fonts.scss";
+@use "fonts/fonts.scss" as *;
 
 
 /*
 * my scss
 */
-@import "style/style.scss";
+@use "style/style.scss" as *;
