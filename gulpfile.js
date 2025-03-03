@@ -6,7 +6,7 @@ import uglify from 'gulp-uglify';
 import browserSync from 'browser-sync';
 import autoprefixer from 'gulp-autoprefixer';
 import clean from 'gulp-clean';
-import avif from 'gulp-avif';
+// import avif from 'gulp-avif';
 import webp from 'gulp-webp';
 import imagemin from 'gulp-imagemin';
 import newer from 'gulp-newer';
@@ -35,14 +35,11 @@ function fonts() {
 function images() {
   return src(['app/images/src/*.*', '!app/images/src/*.svg'])
     .pipe(newer('app/images'))
-    .pipe(avif({ quality: 50 }))
-    .pipe(src('app/images/src/*.*'))
-    .pipe(newer('app/images'))
     .pipe(webp())
     .pipe(src('app/images/src/*.*'))
     .pipe(newer('app/images'))
     .pipe(imagemin())
-    .pipe(dest('app/images'))
+    .pipe(dest('app/images'));
 }
 
 function sprite() {
