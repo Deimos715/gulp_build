@@ -25,23 +25,28 @@ function pages() {
     .pipe(browserSync.stream())
 }
 
+
 function fonts() {
   return src('app/fonts/src/*.ttf')
     .pipe(ttf2woff2())
     .pipe(dest('app/fonts'));
 }
 
+
 function images() {
-  src(['app/images/src/*.{png,jpg,jpeg}', '!app/images/src/*.svg'], { encoding: false })
+  // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
+  src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
     .pipe(newer('app/images'))
     .pipe(webp())
     .pipe(dest('app/images'));
 
-  return src(['app/images/src/*.{png,jpg,jpeg}', '!app/images/src/*.svg'], { encoding: false })
+  // Обрабатываем все изображения (включая SVG) с использованием imagemin
+  return src('app/images/src/*.*', { encoding: false })
     .pipe(newer('app/images'))
     .pipe(imagemin())
     .pipe(dest('app/images'));
 }
+
 
 function sprite() {
   return src('app/images/*.svg')
@@ -56,6 +61,7 @@ function sprite() {
     .pipe(dest('app/images'))
 }
 
+
 function scripts() {
   return src([
     'app/js/main.js',
@@ -66,6 +72,7 @@ function scripts() {
     .pipe(browserSync.stream())
 }
 
+
 function styles() {
   return src('app/scss/main.scss')
     .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
@@ -75,6 +82,7 @@ function styles() {
     .pipe(dest('app/css'))
     .pipe(browserSync.stream());
 }
+
 
 function watching() {
   browserSync.init({
@@ -89,10 +97,12 @@ function watching() {
   watch(['app/*.html']).on('change', browserSync.reload);
 }
 
+
 function cleanDist() {
   return src('dist')
     .pipe(clean())
 }
+
 
 function building() {
   return src([
@@ -107,6 +117,7 @@ function building() {
   ], { base: 'app' })
     .pipe(dest('dist'))
 }
+
 
 export { styles, images, fonts, pages, building, sprite, scripts, watching };
 export const build = series(cleanDist, building);
