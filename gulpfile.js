@@ -9,6 +9,7 @@ import clean from 'gulp-clean';
 import webp from 'gulp-webp';
 import imagemin from 'gulp-imagemin';
 import newer from 'gulp-newer';
+import avif from 'gulp-avif';
 import ttf2woff2 from 'gulp-ttf2woff2';
 import svgSprite from 'gulp-svg-sprite';
 import include from 'gulp-include';
@@ -38,6 +39,12 @@ function images() {
   src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
     .pipe(newer('app/images'))
     .pipe(webp())
+    .pipe(dest('app/images'));
+
+  // Обрабатываем все изображения (кроме SVG) и конвертируем в AVIF
+  src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
+    .pipe(newer('app/images'))
+    .pipe(avif({ quality: 50 }))
     .pipe(dest('app/images'));
 
   // Обрабатываем все изображения (включая SVG) с использованием imagemin
