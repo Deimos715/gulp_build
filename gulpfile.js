@@ -46,6 +46,7 @@ function fontsBuild() {
 }
 
 
+// Обработка изображений
 function images() {
   // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
   src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
@@ -67,6 +68,7 @@ function images() {
 }
 
 
+// Спрайт
 function sprite() {
   return src('app/images/*.svg')
     .pipe(svgSprite({
@@ -144,7 +146,7 @@ function scriptsBuild() {
 }
 
 // Обновление ссылок в HTML
-function updateReferences() {
+function updateReferencesJs() {
   const manifest = src('dist/js/rev-manifest.json');
 
   return src('dist/**/*.html')
@@ -229,5 +231,5 @@ function building() {
 
 
 export { styles, images, fonts, pages, building, sprite, scripts, watching };
-export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, building, updateReferences, updateReferencesCss);
+export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, building, updateReferencesJs, updateReferencesCss);
 export default parallel(styles, images, scripts, pages, watching);
