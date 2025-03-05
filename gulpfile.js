@@ -14,9 +14,13 @@ import ttf2woff2 from 'gulp-ttf2woff2';
 import svgSprite from 'gulp-svg-sprite';
 import include from 'gulp-include';
 import cleanCSS from 'gulp-clean-css';
+import webpack from 'webpack-stream';
+import rev from 'gulp-rev';
+import revReplace from 'gulp-rev-replace';
 
 const scss = sass(sassCompiler);
 
+// Обработка страниц
 function pages() {
   return src('app/pages/*.html')
     .pipe(include({
@@ -26,11 +30,19 @@ function pages() {
     .pipe(browserSync.stream())
 }
 
-
+// Обработка шрифтов
+// Dev
 function fonts() {
-  return src('app/fonts/src/*.ttf')
+  return src('app/fonts/src/*.ttf', { encoding: false })
     .pipe(ttf2woff2())
     .pipe(dest('app/fonts'));
+}
+
+// Prod
+function fontsBuild() {
+  return src('app/fonts/src/*.ttf', { encoding: false })
+    .pipe(ttf2woff2())
+    .pipe(dest('dist/fonts'));
 }
 
 
@@ -69,17 +81,80 @@ function sprite() {
 }
 
 
+// Обработка скриптов
+// Dev
 function scripts() {
-  return src([
-    'app/js/main.js',
-  ])
+  return src('app/js_src/main.js')
+    .pipe(webpack({
+      mode: 'development',
+      output: {
+        filename: 'bundle.js'
+      },
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env']
+              }
+            }
+          }
+        ]
+      }
+    }))
     .pipe(concat('main.min.js'))
     .pipe(uglify())
     .pipe(dest('app/js'))
-    .pipe(browserSync.stream())
+    .pipe(browserSync.stream());
+}
+
+//Prod
+function scriptsBuild() {
+  return src('app/js_src/main.js')
+    .pipe(webpack({
+      mode: 'production',
+      output: {
+        filename: 'bundle.js'
+      },
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-env']
+              }
+            }
+          }
+        ]
+      }
+    }))
+    .pipe(concat('main.min.js'))
+    .pipe(uglify())
+    .pipe(rev())
+    .pipe(dest('dist/js'))
+    .pipe(rev.manifest())
+    .pipe(dest('dist/js'))
+    .pipe(browserSync.stream());
+}
+
+// Обновление ссылок в HTML
+function updateReferences() {
+  const manifest = src('dist/js/rev-manifest.json');
+
+  return src('dist/**/*.html')
+    .pipe(revReplace({ manifest }))
+    .pipe(dest('dist'));
 }
 
 
+// Обработка стилей
+// Dev
 function styles() {
   return src('app/scss/main.scss')
     .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
@@ -90,7 +165,29 @@ function styles() {
     .pipe(browserSync.stream());
 }
 
+// Prod
+function stylesBuild() {
+  return src('app/scss/main.scss')
+    .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
+    .pipe(concat('style.min.css'))
+    .pipe(scss())
+    .pipe(cleanCSS())
+    .pipe(rev())
+    .pipe(dest('dist/css'))
+    .pipe(rev.manifest())
+    .pipe(dest('dist/css'));
+}
 
+function updateReferencesCss() {
+  const manifest = src('dist/css/rev-manifest.json');
+
+  return src('dist/**/*.html')
+    .pipe(revReplace({ manifest }))
+    .pipe(dest('dist'));
+}
+
+
+// Слежение за файлами
 function watching() {
   browserSync.init({
     server: {
@@ -99,33 +196,38 @@ function watching() {
   });
   watch(['app/scss/**/*.scss'], styles)
   watch(['app/images/src'], images)
-  watch(['app/js/main.js'], scripts)
+  watch(['app/js_src/**/*.js'], scripts)
   watch(['app/components/*', 'app/pages/*'], pages)
+  watch(['app/fonts/src/*'], fonts);
   watch(['app/*.html']).on('change', browserSync.reload);
 }
 
 
+// Очистка папки dist
 function cleanDist() {
-  return src('dist')
-    .pipe(clean())
+  return src('dist', { allowEmpty: true })
+    .pipe(clean());
 }
 
 
+// Сбор
 function building() {
   return src([
-    'app/css/style.min.css',
+    '!app/css/style.min.css',
     '!app/images/**/*.html',
     'app/images/*.*',
     '!app/images/*.svg',
     'app/images/sprite.svg',
-    'app/fonts/*.*',
-    'app/js/main.min.js',
-    'app/**/*.html'
-  ], { base: 'app' })
+    '!app/fonts/*.*',
+    '!app/js/main.min.js',
+    'app/**/*.html',
+    '!app/pages/**/*',
+    '!app/components/**/*'
+  ], { base: 'app', allowEmpty: true },)
     .pipe(dest('dist'))
 }
 
 
 export { styles, images, fonts, pages, building, sprite, scripts, watching };
-export const build = series(cleanDist, building);
+export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, building, updateReferences, updateReferencesCss);
 export default parallel(styles, images, scripts, pages, watching);
