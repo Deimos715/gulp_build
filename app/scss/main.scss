@@ -1,4 +1,10 @@
 /*
+* Connecting CSS Fontawesome
+*/
+@use "../../node_modules/@fortawesome/fontawesome-free/css/all.min.css" as *;
+
+
+/*
 * Connecting SCSS sources normalize-css
 */
 
@@ -10,7 +16,6 @@
 */
 
 @use "reset/reset.scss" as *;
-
 
 
 /*

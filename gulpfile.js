@@ -46,6 +46,20 @@ function fontsBuild() {
 }
 
 
+// Обработка шрифтов Fontawesome
+// Dev
+function copyFontAwesome() {
+  return src('node_modules/@fortawesome/fontawesome-free/webfonts/*', { encoding: false })
+    .pipe(dest('app/webfonts'));
+}
+
+// Prod
+function copyFontAwesomeBuild() {
+  return src('node_modules/@fortawesome/fontawesome-free/webfonts/*', { encoding: false })
+    .pipe(dest('dist/webfonts'));
+}
+
+
 // Обработка изображений
 // Dev
 function images() {
@@ -258,6 +272,6 @@ function building() {
 }
 
 
-export { styles, images, fonts, pages, building, sprite, scripts, watching };
-export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, imagesBuild, building, updateReferencesJs, updateReferencesCss);
-export default parallel(styles, images, scripts, pages, watching);
+export { styles, images, copyFontAwesome, fonts, pages, building, sprite, scripts, watching };
+export const build = series(cleanDist, copyFontAwesomeBuild, fontsBuild, scriptsBuild, stylesBuild, imagesBuild, building, updateReferencesJs, updateReferencesCss);
+export default parallel(styles, images, scripts, pages, copyFontAwesome, watching);
