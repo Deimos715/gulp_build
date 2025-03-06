@@ -17,6 +17,7 @@ import cleanCSS from 'gulp-clean-css';
 import webpack from 'webpack-stream';
 import rev from 'gulp-rev';
 import revReplace from 'gulp-rev-replace';
+import replace from 'gulp-replace';
 
 const scss = sass(sassCompiler);
 
@@ -50,13 +51,13 @@ function fontsBuild() {
 // Dev
 function copyFontAwesome() {
   return src('node_modules/@fortawesome/fontawesome-free/webfonts/*', { encoding: false })
-    .pipe(dest('app/webfonts'));
+    .pipe(dest('app/fonts'));
 }
 
 // Prod
 function copyFontAwesomeBuild() {
   return src('node_modules/@fortawesome/fontawesome-free/webfonts/*', { encoding: false })
-    .pipe(dest('dist/webfonts'));
+    .pipe(dest('dist/fonts'));
 }
 
 
@@ -202,6 +203,7 @@ function styles() {
       silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'] // Игнорирование предупреждений
     }))
     .pipe(cleanCSS())
+    .pipe(replace('../webfonts/', '../fonts/')) // Замена путей для FontAwesome
     .pipe(dest('app/css'))
     .pipe(browserSync.stream());
 }
@@ -216,6 +218,7 @@ function stylesBuild() {
       silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'] // Игнорирование предупреждений
     }))
     .pipe(cleanCSS())
+    .pipe(replace('../webfonts/', '../fonts/')) // Замена путей для FontAwesome
     .pipe(rev())
     .pipe(dest('dist/css'))
     .pipe(rev.manifest())

@@ -5,4 +5,4 @@
 /dist
 
 #fontawesome
-/app/webfonts
+/app/fonts/fa*
