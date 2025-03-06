@@ -47,6 +47,7 @@ function fontsBuild() {
 
 
 // Обработка изображений
+// Dev
 function images() {
   // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
   src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
@@ -65,6 +66,27 @@ function images() {
     .pipe(newer('app/images'))
     .pipe(imagemin())
     .pipe(dest('app/images'));
+}
+
+// Prod
+function imagesBuild() {
+  // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
+  src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
+    .pipe(newer('dist/images'))
+    .pipe(webp())
+    .pipe(dest('dist/images'));
+
+  // Обрабатываем все изображения (кроме SVG) и конвертируем в AVIF
+  src(['app/images/src/*.*', '!app/images/src/*.svg'], { encoding: false })
+    .pipe(newer('dist/images'))
+    .pipe(avif({ quality: 50 }))
+    .pipe(dest('dist/images'));
+
+  // Обрабатываем все изображения (включая SVG) с использованием imagemin
+  return src('app/images/src/*.*', { encoding: false })
+    .pipe(newer('dist/images'))
+    .pipe(imagemin())
+    .pipe(dest('dist/images'));
 }
 
 
@@ -161,7 +183,10 @@ function styles() {
   return src('app/scss/main.scss')
     .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
     .pipe(concat('style.min.css'))
-    .pipe(scss())
+    .pipe(scss({ 
+      implementation: sassCompiler, 
+      silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'] // Игнорирование предупреждений
+    }))
     .pipe(cleanCSS())
     .pipe(dest('app/css'))
     .pipe(browserSync.stream());
@@ -172,7 +197,10 @@ function stylesBuild() {
   return src('app/scss/main.scss')
     .pipe(autoprefixer({ overrideBrowserslist: ['last 10 version'] }))
     .pipe(concat('style.min.css'))
-    .pipe(scss())
+    .pipe(scss({ 
+      implementation: sassCompiler, 
+      silenceDeprecations: ['legacy-js-api', 'mixed-decls', 'color-functions', 'global-builtin', 'import'] // Игнорирование предупреждений
+    }))
     .pipe(cleanCSS())
     .pipe(rev())
     .pipe(dest('dist/css'))
@@ -217,7 +245,7 @@ function building() {
   return src([
     '!app/css/style.min.css',
     '!app/images/**/*.html',
-    'app/images/*.*',
+    '!app/images/*.*',
     '!app/images/*.svg',
     'app/images/sprite.svg',
     '!app/fonts/*.*',
@@ -231,5 +259,5 @@ function building() {
 
 
 export { styles, images, fonts, pages, building, sprite, scripts, watching };
-export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, building, updateReferencesJs, updateReferencesCss);
+export const build = series(cleanDist, fontsBuild, scriptsBuild, stylesBuild, imagesBuild, building, updateReferencesJs, updateReferencesCss);
 export default parallel(styles, images, scripts, pages, watching);
