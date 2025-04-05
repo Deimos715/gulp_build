@@ -14,7 +14,8 @@ import ttf2woff2 from 'gulp-ttf2woff2';
 import svgSprite from 'gulp-svg-sprite';
 import include from 'gulp-include';
 import cleanCSS from 'gulp-clean-css';
-import webpack from 'webpack-stream';
+import webpack from 'webpack';
+import webpackStream from 'webpack-stream';
 import rev from 'gulp-rev';
 import revReplace from 'gulp-rev-replace';
 import replace from 'gulp-replace';
@@ -27,6 +28,7 @@ function pages() {
     .pipe(include({
       includePaths: 'app/components'
     }))
+    .pipe(replace(/\n\s*\n/g, '\n')) // Удаление лишних строк
     .pipe(dest('app'))
     .pipe(browserSync.stream())
 }
@@ -124,7 +126,7 @@ function sprite() {
 // Dev
 function scripts() {
   return src('app/js_src/main.js')
-    .pipe(webpack({
+    .pipe(webpackStream({
       mode: 'development',
       output: {
         filename: 'bundle.js'
@@ -142,8 +144,15 @@ function scripts() {
             }
           }
         ]
-      }
-    }))
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          'window.jQuery': 'jquery',
+        }), // Включение Jquery глобально
+      ],
+    }, webpack))
     .pipe(concat('main.min.js'))
     .pipe(uglify())
     .pipe(dest('app/js'))
@@ -153,7 +162,7 @@ function scripts() {
 //Prod
 function scriptsBuild() {
   return src('app/js_src/main.js')
-    .pipe(webpack({
+    .pipe(webpackStream({
       mode: 'production',
       output: {
         filename: 'bundle.js'
@@ -171,8 +180,15 @@ function scriptsBuild() {
             }
           }
         ]
-      }
-    }))
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+          'window.jQuery': 'jquery',
+        }), // Включение Jquery глобально
+      ],
+    }, webpack))
     .pipe(concat('main.min.js'))
     .pipe(uglify())
     .pipe(rev())
