@@ -8635,18 +8635,50 @@ table {
 * fonts
 */
 @font-face {
-  font-family: "Inter";
-  src: local("RInter");
-  src: url("../fonts/Inter_Regular.woff2") format("woff2"), url("../fonts/Inter_Regular.woff") format("woff");
+  font-family: "Roboto_g";
+  src: local("Roboto");
+  src: url("../fonts/RobotoRegular.woff2") format("woff2"), url("../fonts/RobotoRegular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Inter";
-  src: local("RInter");
-  src: url("../fonts/Inter_Bold.woff2") format("woff2"), url("../fonts/Inter_Bold.woff") format("woff");
+  font-family: "Roboto_g";
+  src: local("Roboto");
+  src: url("../fonts/RobotoBold.woff2") format("woff2"), url("../fonts/RobotoBold.woff") format("woff");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto_g";
+  src: local("Roboto");
+  src: url("../fonts/RobotoMedium.woff2") format("woff2"), url("../fonts/RobotoMedium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto_g";
+  src: local("Roboto");
+  src: url("../fonts/RobotoBlack.woff2") format("woff2"), url("../fonts/RobotoBlack.woff") format("woff");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Baron_g";
+  src: local("Baron");
+  src: url("../fonts/BaronBold.woff2") format("woff2"), url("../fonts/BaronBold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Baron_g";
+  src: local("Baron");
+  src: url("../fonts/BaronBlack.woff2") format("woff2"), url("../fonts/BaronBlack.woff") format("woff");
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -8664,9 +8696,9 @@ table {
 Table of Content
 
     - Global
-
-
-
+    - Header
+    - Main
+    - Footer
 ----------------------------------- */
 /* -----------------------------------
 		Global
@@ -8678,12 +8710,87 @@ Table of Content
           box-sizing: border-box;
 }
 
-a {
-  text-decoration: none;
+::-webkit-input-placeholder {
+  color: #666;
+}
+
+::-moz-placeholder {
+  color: #666;
+}
+
+:-ms-input-placeholder {
+  color: #666;
+}
+
+::-ms-input-placeholder {
+  color: #666;
+}
+
+::placeholder {
+  color: #666;
+}
+
+::-moz-selection {
+  background-color: #ec1c1c;
+  color: #fff;
+}
+
+::selection {
+  background-color: #ec1c1c;
+  color: #fff;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  font-size: 18px;
+  min-width: 320px;
+  position: relative;
+  line-height: 1.5;
+  font-family: "Roboto_g", sans-serif;
+  overflow-x: hidden;
+  color: #333;
+}
+body input,
+body textarea {
+  border: #666 1px solid;
+  outline: none;
+}
+body input:focus:required:invalid,
+body textarea:focus:required:invalid {
+  border-color: red;
+}
+body input:required:valid,
+body textarea:required:valid {
+  border-color: green;
+}
+
+.img-responsive {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.img-responsive.img-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+a {
+  color: #ec1c1c;
+  text-decoration: none;
+}
+a:hover, a:focus {
+  color: #ec1c1c;
 }
 
 .container {
@@ -8692,51 +8799,8 @@ html {
   margin: 0 auto;
 }
 
-.header-section {
-  background-color: #F0F0F0;
-}
-.header-section__nav-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  height: 69px;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-.nav-menu__list {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-}
-.nav-menu__list-item {
-  margin-right: 64px;
-  font-size: 18px;
-}
-.nav-menu__list-item:last-child {
-  margin-right: 0;
-}
-
-/* -----------------------------------
-		Header
------------------------------------ */
 /* -----------------------------------
 		Main
------------------------------------ */
-/* -----------------------------------
-		Footer
 ----------------------------------- */
 @media (max-width: 1199px) {
   .container {
