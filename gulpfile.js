@@ -173,12 +173,39 @@ function scripts() {
               "window.jQuery": "jquery",
             }), // Включение Jquery глобально
           ],
+          // Отслеживание ошибок, сборка не падает
+          stats: {
+            errorDetails: true,  // Добавлено для детализации ошибок
+            modules: false,
+            chunks: false
+          }
         },
-        webpack
-      )
-    )
+        webpack, function (err, stats) {
+          if (err) {
+            console.error('Webpack error:', err.message);
+            this.emit('end');
+          }
+          if (stats?.hasErrors()) {
+            stats.toJson('errors-only').errors.forEach(error => {
+              console.error(`Error in ${error.moduleName || 'unknown'}:`);
+              console.error(error.message.split('\n')[0]);
+              if (error.loc) {
+                console.error(`At line ${error.loc.line}, column ${error.loc.column}`);
+              }
+            });
+            this.emit('end');
+          }
+        }))
+    .on('error', function (err) {
+      console.error('Scripts error:', err.message);
+      this.emit('end');
+    })
     .pipe(concat("main.min.js"))
-    .pipe(uglify())
+    .pipe(uglify().on('error', function (err) {
+      console.error('Uglify error:', err.message);
+      if (err.line) console.error(`At line ${err.line}, column ${err.col}`);
+      this.emit('end');
+    }))
     .pipe(dest("app/js"))
     .pipe(browserSync.stream());
 }
