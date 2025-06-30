@@ -85,44 +85,54 @@ function copyFontAwesomeBuild() {
 // Обработка изображений
 // Dev
 function images() {
-  // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
-  src(["app/images/src/*.*", "!app/images/src/*.svg"], { encoding: false })
-    .pipe(newer("app/images"))
+  const imgSrc = ["app/images/src/**/*.*", "!app/images/src/**/*.svg"]; // Обрабатываем все изображения (кроме SVG)
+  const imgAll = "app/images/src/**/*.*";
+  const destPath = "app/images";
+  const baseDir = "app/images/src";
+
+  // WebP
+  src(imgSrc, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(webp())
-    .pipe(dest("app/images"));
+    .pipe(dest(destPath));
 
-  // Обрабатываем все изображения (кроме SVG) и конвертируем в AVIF
-  src(["app/images/src/*.*", "!app/images/src/*.svg"], { encoding: false })
-    .pipe(newer("app/images"))
+  // AVIF
+  src(imgSrc, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(avif({ quality: 50 }))
-    .pipe(dest("app/images"));
+    .pipe(dest(destPath));
 
-  // Обрабатываем все изображения (включая SVG) с использованием imagemin
-  return src("app/images/src/*.*", { encoding: false })
-    .pipe(newer("app/images"))
+  // Imagemin (все файлы, включая SVG)
+  return src(imgAll, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(imagemin())
-    .pipe(dest("app/images"));
+    .pipe(dest(destPath));
 }
 
 // Prod
 function imagesBuild() {
-  // Обрабатываем все изображения (кроме SVG) и конвертируем в WebP
-  src(["app/images/src/*.*", "!app/images/src/*.svg"], { encoding: false })
-    .pipe(newer("dist/images"))
+  const imgSrc = ["app/images/src/**/*.*", "!app/images/src/**/*.svg"]; // Обрабатываем все изображения (кроме SVG)
+  const imgAll = "app/images/src/**/*.*";
+  const destPath = "dist/images";
+  const baseDir = "app/images/src";
+
+  // WebP
+  src(imgSrc, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(webp())
-    .pipe(dest("dist/images"));
+    .pipe(dest(destPath));
 
-  // Обрабатываем все изображения (кроме SVG) и конвертируем в AVIF
-  src(["app/images/src/*.*", "!app/images/src/*.svg"], { encoding: false })
-    .pipe(newer("dist/images"))
+  // AVIF
+  src(imgSrc, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(avif({ quality: 50 }))
-    .pipe(dest("dist/images"));
+    .pipe(dest(destPath));
 
-  // Обрабатываем все изображения (включая SVG) с использованием imagemin
-  return src("app/images/src/*.*", { encoding: false })
-    .pipe(newer("dist/images"))
+  // Imagemin (все файлы, включая SVG)
+  return src(imgAll, { base: baseDir, encoding: false })
+    .pipe(newer(destPath))
     .pipe(imagemin())
-    .pipe(dest("dist/images"));
+    .pipe(dest(destPath));
 }
 
 // Спрайт
